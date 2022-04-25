@@ -30,7 +30,42 @@ Eigen::Matrix<double,4,4,Eigen::RowMajor> GetHomographicTransformation(
   // (c0[1][0],c0[][1],z) -> (c1[1][0],c1[1][1],z)
   // (c0[2][0],c0[][1],z) -> (c1[2][0],c1[2][1],z)
   // (c0[3][0],c0[][1],z) -> (c1[3][0],c1[3][1],z)
-
+  //Let H be the 3x3 Homographic
+  Eigen::Matrix<double,3,3,Eigen::RowMajor> H;
+  //Let x=[H11, H12,..., H33], we can have Ax=0, matrix A (8x9) is defined as follows.
+  Eigen::Matrix<double,8,9,Eigen::RowMajor> A;
+  A<<
+    -c0[0][0], -c0[0][1], -1, 0 , 0, 0, c0[0][0]*c1[0][0], c0[0][1]*c1[0][0], c1[0][0],
+    0 , 0, 0, -c0[0][0], -c0[0][1], -1, c0[0][0]*c1[0][1], c0[0][1]*c1[0][1], c1[0][1],
+    -c0[1][0], -c0[1][1], -1, 0 , 0, 0, c0[1][0]*c1[1][0], c0[1][1]*c1[1][0], c1[1][0],
+    0 , 0, 0, -c0[1][0], -c0[1][1], -1, c0[1][0]*c1[1][1], c0[1][1]*c1[1][1], c1[1][1],
+    -c0[2][0], -c0[2][1], -1, 0 , 0, 0, c0[2][0]*c1[2][0], c0[2][1]*c1[2][0], c1[2][0],
+    0 , 0, 0, -c0[2][0], -c0[2][1], -1, c0[2][0]*c1[2][1], c0[2][1]*c1[2][1], c1[2][1],
+    -c0[3][0], -c0[3][1], -1, 0 , 0, 0, c0[3][0]*c1[3][0], c0[3][1]*c1[3][0], c1[3][0],
+    0 , 0, 0, -c0[3][0], -c0[3][1], -1, c0[3][0]*c1[3][1], c0[3][1]*c1[3][1], c1[3][1];
+  // To solve Ax=0, we use svd decomposition. A=USVT, then x equals to the last colum of matrix V 
+  Eigen::JacobiSVD<Eigen::MatrixXd> svd(A, Eigen::ComputeThinU | Eigen::ComputeFullV );
+  Eigen::Matrix<double,9,9,Eigen::RowMajor> V=svd.matrixV();  
+  //Fetch results from the last colum of matrix V
+  for(int i=0;i<3;i++)
+  {
+    for(int j=0;j<3;j++)
+    {
+      H(i,j)=V(i*3+j,8);
+    }
+  }
+  //Let H33=1
+  H=H/H(2,2);
+  
+  //Convert 3x3 matrix into 4x4 matrix
+  m(0,0)=H(0,0);
+  m(0,1)=H(0,1);
+  m(1,0)=H(1,0);
+  m(1,1)=H(1,1);
+  m(3,0)=H(2,0);
+  m(3,1)=H(2,1);
+  m(0,3)=H(0,2);
+  m(1,3)=H(1,2);
   return m;
 }
 
