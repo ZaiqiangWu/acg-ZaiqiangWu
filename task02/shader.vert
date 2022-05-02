@@ -30,6 +30,18 @@ void main()
     // the "back" direction (i.e., +Z direction) will be projected as the unit circle in XY plane.
     // in GLSL, you can use built-in math function (e.g., sqrt, atan).
     // look at page 56 of https://www.khronos.org/registry/OpenGL/specs/gl/GLSLangSpec.1.20.pdf
+    //In normalized device coordinates, OpenGL uses a left-handed system, so we can assume the len is facing +Z direction
+    float r_near = 0.01;
+    float r_far = 100.0;
+    vec3 vertex = vec3(x0,y0,z0);
+    vec3 cam_pos = vec3(0,0,cam_z_pos);
+    vec3 lookat = vertex + cam_pos;
+    float r = length(lookat);
+    z0 = 2/(r_far-r_near)*r-(r_far+r_near)/(r_far-r_near);
+    float theta = atan(length(lookat.xy),lookat.z);
+    vec2 new_xy = theta/PI*normalize(lookat.xy);
+    x0 = new_xy.x;
+    y0 = new_xy.y;
     float x1 = x0;
     float y1 = y0;
     float z1 = z0;
