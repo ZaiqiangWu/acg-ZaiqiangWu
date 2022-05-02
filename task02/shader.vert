@@ -35,7 +35,7 @@ void main()
     float r_far = 100.0;
     vec3 vertex = vec3(x0,y0,z0);
     vec3 cam_pos = vec3(0,0,cam_z_pos);
-    vec3 lookat = vertex + cam_pos;
+    vec3 lookat = vertex - cam_pos;
     float r = length(lookat);
     z0 = 2/(r_far-r_near)*r-(r_far+r_near)/(r_far-r_near);
     float theta = atan(length(lookat.xy),lookat.z);
