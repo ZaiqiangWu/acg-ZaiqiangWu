@@ -16,6 +16,38 @@ float sdf_box( vec3 pos, vec3 hsize )
   return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
 }
 
+// Definition of singed distance funtion of the big sphere
+float sdf_big_sphere( vec3 pos, float radius )
+{
+  float d = length(pos) - radius;
+  return d;
+}
+
+//120 version doesn't support round operation, so I implemented it bt myself.
+int round(float x)
+{
+  int x1=int(x);
+  int x2=x1;
+  if(x>0.0)
+  x2++;
+  else
+  x2--;
+  if(abs(x-x1)<abs(x-x2)) return x1;
+  else return x2;
+}
+
+// Definition of singed distance funtion of small spheres
+float sdf_small_spheres( vec3 pos, float radius )
+{
+  
+  int idx=round(pos.x/0.2);
+  int idy=round(pos.y/0.2);
+  int idz=round(pos.z/0.2);
+  float intrval=0.2;
+  vec3 center=vec3(idx*intrval,idy*intrval,idz*intrval);
+  return length(pos-center)-radius;
+}
+
 // Definition of singed distance funtion called from
 float SDF(vec3 pos)
 {
@@ -25,9 +57,10 @@ float SDF(vec3 pos)
   // The radius of the small spheres is `0.12` and it's repeaded at intrval of `0.2` in the grid pattern
   // Look Inigo Quilez's article for hints:
   // https://iquilezles.org/articles/distfunctions/
-
+  //subtraction operation between big spheres and small spheres
+   return max(sdf_big_sphere(pos,0.8),-sdf_small_spheres(pos,0.12));
   // for "problem2" the code below is not used.
-  return sdf_box(pos, vec3(0.1,0.2,0.3));
+  //return sdf_box(pos, vec3(0.1,0.2,0.3));
 }
 
 void main()
