@@ -48,11 +48,28 @@ double SamplingHemisphere(
   // hint3: for longitude use inverse sampling method to achieve cosine weighted sample.
   // hint4: first assume z is the up in the polar coordinate, then rotate the sampled direction such that "z" will be up.
   // write some codes below (5-10 lines)
-
-
+  //Uniform sampling within 2D unit circle
+  double r=sqrt(dfm2::MyERand48<double>(Xi));
+  double theta=dfm2::MyERand48<double>(Xi)*2*M_PI;
+  dir[0] = r*cos(theta);
+  dir[1] = r*sin(theta);
+  //Project them to the hemisphere surface to achieve cosine weighted probabilistic distribution
+  dir[2] = sqrt(1-dir[0]*dir[0]-dir[1]*dir[1]);
+  dfm2::CVec3d d=dfm2::CVec3d(dir[0],dir[1],dir[2]);
+  dfm2::CVec3d normal=dfm2::CVec3d(nrm[0],nrm[1],nrm[2]);
+  //let x, y, z be the column vectors of the rotation matrix that rotate (0,0,1) to normal vector
+  dfm2::CVec3d z=normal;
+  dfm2::CVec3d x=normal.cross(dfm2::CVec3d(0,0,1)).normalized();
+  dfm2::CVec3d y=normal.cross(x);
+  //rotate the sampled vector
+  d=x*dir[0]+y*dir[1]+z*dir[2];
+  for(int i=0;i<3;i++)
+  {
+    dir[i]=d(i);
+  }
   // below: naive implementation to "uniformly" sample hemisphere using "rejection sampling"
   // to not be used for the "problem2" in the assignment
-  for(int i=0;i<10;++i) { // 10 is a magic number
+  /*for(int i=0;i<10;++i) { // 10 is a magic number
     const auto d0 = dfm2::MyERand48<double>(Xi);  // you can sample uniform distribution [0,1] with this function
     const auto d1 = dfm2::MyERand48<double>(Xi);
     const auto d2 = dfm2::MyERand48<double>(Xi);
@@ -70,7 +87,8 @@ double SamplingHemisphere(
     if( cos < 0 ){ continue; }
     return cos*2;  // (coefficient=1/M_PI) * (area_of_hemisphere=M_PI*2) = 2
   }
-  return 0;
+  return 0;*/
+  return 1.0;
 }
 
 double SampleAmbientOcclusion(
