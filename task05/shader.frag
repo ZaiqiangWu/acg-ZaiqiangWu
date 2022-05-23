@@ -155,9 +155,9 @@ void main()
 
   // the following three lines of function is not used for Problem2
   // The code is here to give the idea what the cubic Bezier curve looks like
-  for(int i=0;i<10;++i){
-    Distance = min(Distance, length(EvaluateBezier(0.1*i, bezier)));
-  }
+  //for(int i=0;i<10;++i){
+  //  Distance = min(Distance, length(EvaluateBezier(0.1*i, bezier)));
+  //}
 
   // this is the structure to store the range
   struct range {
@@ -185,6 +185,12 @@ void main()
     // Problem2 of the assignment
     // write some code to complete the implementation of bisection method
     // around 10 lines of code should be enough
+    else
+    {
+      stack[nstack++]=range(lower,middle, SturmNumber(lower,sturm_seq), SturmNumber(middle,sturm_seq));
+      stack[nstack++]=range(middle,upper, SturmNumber(middle,sturm_seq), SturmNumber(upper,sturm_seq));
+    }
+
   }
 
 
